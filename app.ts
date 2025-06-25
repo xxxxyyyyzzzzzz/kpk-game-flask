@@ -1,6 +1,6 @@
 // Оновлені імпорти для Deno з використанням JSR
 import { Application, Router, send } from "oak";
-import { Database } from "sqlite";  // З JSR
+import { DB } from "https://deno.land/x/sqlite@v3.8/mod.ts";
 import { Server } from "socketio";
 import { join } from "std/path";
 import { getCookies, setCookie } from "std/http/cookie.ts";
@@ -35,8 +35,8 @@ const COOLDOWN_SECONDS = 10;
 
 // --- УТИЛІТИ ДЛЯ БАЗИ ДАНИХ (SQLite) ---
 
-function getDb(): Database {
-    return new Database(DATABASE_PATH);
+function getDb(): DB {  // Змінити тип повернення на DB
+    return new DB(DATABASE_PATH);  // Використовуємо DB, не Database
 }
 
 function initDb() {
