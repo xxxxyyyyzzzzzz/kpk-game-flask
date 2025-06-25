@@ -1,0 +1,18 @@
+{
+  "name": "kpk_game_node",
+  "version": "1.0.0",
+  "description": "KPK game backend rewritten in Node.js",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "keywords": [],
+  "author": "Your Name",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5",
+    "sqlite3": "^5.1.7"
+  }
+}
+
