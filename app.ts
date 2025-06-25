@@ -1,58 +1,47 @@
-// Імпорти для Deno
+// Оновлені імпорти для Deno з використанням JSR
 import { Application, Router, send } from "oak";
-import { DB } from "sqlite";
+import { Database } from "sqlite";  // З JSR
 import { Server } from "socketio";
-import { WebSocketAdapter } from "socketio_adapter_ws";
 import { join } from "std/path";
 import { getCookies, setCookie } from "std/http/cookie.ts";
-import { toHashString } from "std/crypto/to_hash_string.ts";
-import { decode, encode } from "std/encoding/hex.ts";
+import { encodeHex, decodeHex } from "std/encoding/hex.ts";
 
 // --- КОНСТАНТИ ТА ІНІЦІАЛІЗАЦІЯ ---
 
 // Конфігурація додатка Oak
 const app = new Application();
 const router = new Router();
-const port = parseInt(Deno.env.get("PORT") || "3000"); // Використовуємо порт з ENV або 3000 за замовчуванням
+const port = parseInt(Deno.env.get("PORT") || "3000");
 
-// Ініціалізація Socket.IO сервера для Deno
+// Ініціалізація Socket.IO сервера
 const io = new Server({
     cors: {
-        origin: "*", // Дозволяє підключення з будь-яких доменів (для розробки)
+        origin: "*",
         methods: ["GET", "POST"]
-    },
-    adapter: new WebSocketAdapter() // Використовуємо WebSocketAdapter для Deno
+    }
 });
 
 // Шлях до файлу бази даних SQLite
-// УВАГА: SQLite на Deno Deploy НЕ ЗБЕРІГАЄ ДАНІ постійно.
-// Кожен деплой або перезапуск процесу призводить до втрати даних.
-// Для постійного зберігання потрібна зовнішня база даних (наприклад, Supabase Postgres).
-const DATABASE_PATH = join(Deno.cwd(), 'kpk_game.db'); // Використовуємо Deno.cwd() для поточного робочого каталогу
+const DATABASE_PATH = join(Deno.cwd(), 'kpk_game.db');
 
-// Секретний ключ для підпису сесійних кукі
-// Важливо: у продакшені генеруйте цей ключ надійно і зберігайте його в змінних середовища!
-const SESSION_SECRET_STRING = 'e57724220b3b4f63c87895e7c80529d4791054b1f618d3600f6074127c525f0a1c6298e874558509'; // Той самий ключ, що був у Python/Node.js
-const SESSION_SECRET = new TextEncoder().encode(SESSION_SECRET_STRING); // Перетворюємо в Uint8Array для криптографічних операцій
+// Секретний ключ для сесій
+const SESSION_SECRET_STRING = 'e57724220b3b4f63c87895e7c80529d4791054b1f618d3600f6074127c525f0a1c6298e874558509';
+const SESSION_SECRET = new TextEncoder().encode(SESSION_SECRET_STRING);
 
-// Глобальна кімната для трансляції подій всім підключеним клієнтам
+// Константи гри
 const BROADCAST_ROOM = 'global_broadcast_room';
-
-// Константа для максимальної кількості активних гравців (перших, хто зареєструвався)
 const MAX_ACTIVE_PLAYERS = 4;
 const COOLDOWN_SECONDS = 10;
 
 // --- УТИЛІТИ ДЛЯ БАЗИ ДАНИХ (SQLite) ---
 
-// Функція для підключення до бази даних
-function getDb(): DB {
-    return new DB(DATABASE_PATH);
+function getDb(): Database {
+    return new Database(DATABASE_PATH);
 }
 
-// Функція для ініціалізації схеми бази даних
 function initDb() {
     const db = getDb();
-    db.execute(`
+    db.exec(`
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nickname TEXT UNIQUE NOT NULL,
@@ -62,7 +51,7 @@ function initDb() {
             registration_time TEXT NOT NULL
         );
     `);
-    db.execute(`
+    db.exec(`
         CREATE TABLE IF NOT EXISTS score_history (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
@@ -76,8 +65,8 @@ function initDb() {
     console.log("База даних ініціалізована.");
 }
 
-// Викликаємо ініціалізацію бази даних при запуску програми
 initDb();
+
 
 // Допоміжна функція для отримання нікнеймів активних гравців
 async function getActivePlayerNicknames(): Promise<string[]> {
@@ -112,7 +101,7 @@ async function getPlayer(nickname: string): Promise<any | null> {
 async function createPlayer(nickname: string): Promise<number | null> {
     const db = getDb();
     try {
-        const result = db.query('INSERT INTO users (nickname, score, mission_stats, last_mission_time, registration_time) VALUES (?, ?, ?, ?, ?)',
+        db.query('INSERT INTO users (nickname, score, mission_stats, last_mission_time, registration_time) VALUES (?, ?, ?, ?, ?)',
             [nickname, 0, JSON.stringify({'I': 5, 'II': 5, 'III': 5}), null, new Date().toISOString()]);
         
         // Deno SQLite не повертає lastID напряму, потрібно робити окремий запит
@@ -175,7 +164,7 @@ async function signSession(data: SessionData): Promise<string> {
         await crypto.subtle.importKey("raw", SESSION_SECRET, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]),
         new TextEncoder().encode(payload)
     );
-    return `${encodeURIComponent(payload)}.${encode(new Uint8Array(signature))}`;
+    return `${encodeURIComponent(payload)}.${encodeHex(new Uint8Array(signature))}`; // Використовуємо encodeHex
 }
 
 // Перевірка та розшифровка куки сесії
@@ -184,7 +173,7 @@ async function verifySession(signedCookie: string): Promise<SessionData | null> 
     if (parts.length !== 2) return null;
 
     const payload = decodeURIComponent(parts[0]);
-    const signature = decode(parts[1]);
+    const signature = decodeHex(parts[1]); // Використовуємо decodeHex
 
     try {
         const isValid = await crypto.subtle.verify(
@@ -426,7 +415,7 @@ router.post('/api/complete_mission', async (context) => {
         }
 
         const lastMissionTimeStr = player.last_mission_time;
-        if (lastMissionTimeStr && lastMissionTimeStr !== 'None') { // Deno SQLite returns null for NULL, not "None" string
+        if (lastMissionTimeStr && lastMissionTimeStr !== null) { // Перевірка на null, а не "None"
             const lastMissionTime = new Date(lastMissionTimeStr);
             const timeDiffSeconds = (new Date().getTime() - lastMissionTime.getTime()) / 1000;
             if (timeDiffSeconds < COOLDOWN_SECONDS) {
@@ -475,7 +464,7 @@ router.post('/api/complete_mission', async (context) => {
             };
         } catch (e) {
             console.error(`Помилка виконання місії у транзакції: ${e.message}`, e);
-            db.query('ROLLBACK;');
+            db.query('ROLLBACK;'); // Відкочуємо транзакцію у випадку помилки
             context.response.status = 500;
             context.response.body = { message: `Помилка виконання місії: ${e.message}` };
         } finally {
@@ -606,18 +595,12 @@ io.on('connection', (socket) => {
 
 // --- ЗАПУСК СЕРВЕРА ---
 
-// Додаємо роутер до додатку Oak
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-// Інтегруємо Socket.IO з HTTP-сервером Oak
-// Очікуємо, поки HTTP-сервер почне слухати, потім запускаємо Socket.IO
 app.addEventListener("listen", ({ hostname, port, secure }) => {
     console.log(`Сервер запущено на ${secure ? "https://" : "http://"}${hostname ?? "localhost"}:${port}`);
-    // Socket.IO "прикріплюється" до вже існуючого HTTP-сервера, який Oak створює
     io.attach(app.server); 
 });
 
-// Запускаємо Oak додаток
 await app.listen({ port });
-

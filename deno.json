@@ -1,17 +1,17 @@
-    {
-      "tasks": {
-        "start": "deno run --allow-net --allow-read --allow-write --allow-env app.ts"
-      },
-      "imports": {
-        "oak": "https://deno.land/x/oak@v12.6.1/mod.ts",
-        "sqlite": "https://deno.land/x/sqlite@v3.8.0/mod.ts",
-        "socketio": "https://deno.land/x/socket_io@0.2.0/mod.ts",
-        "socketio_adapter_ws": "https://deno.land/x/socket_io@0.2.0/src/adapters/ws.ts",
-        "uuid": "https://deno.land/std@0.224.0/uuid/mod.ts",
-        "std/path": "https://deno.land/std@0.224.0/path/mod.ts",
-        "std/http/": "https://deno.land/std@0.224.0/http/",
-        "std/crypto/": "https://deno.land/std@0.224.0/crypto/",
-        "std/encoding/": "https://deno.land/std@0.224.0/encoding/"
-      }
-    }
-    
+{
+  "tasks": {
+    "start": "deno run --allow-net --allow-read --allow-env app.ts",
+    "dev": "deno run --watch --allow-net --allow-read --allow-env app.ts"
+  },
+  "imports": {
+    "oak": "https://deno.land/x/oak@v12.6.1/mod.ts",
+    "sqlite": "https://deno.land/x/sqlite@v3.8/mod.ts",  // Версія без FFI для Deploy
+    "socketio": "https://deno.land/x/socket_io@0.2.0/mod.ts",
+    "std/path": "https://deno.land/std@0.224.0/path/mod.ts",
+    "std/http/": "https://deno.land/std@0.224.0/http/",
+    "std/encoding/": "https://deno.land/std@0.224.0/encoding/"
+  },
+  "compilerOptions": {
+    "lib": ["deno.window"]
+  }
+}

@@ -1,9 +1,8 @@
-kpk_game.db
-__pycache__/
-*.pyc
-.env
+/.env
+/deno.lock
+/kpk_game.db  # Локальна база даних
+/.vscode/
+/node_modules/
+
 .DS_Store
-venv/
-node_modules/
-deno.lock
-.deno_plugins/
+Thumbs.db
