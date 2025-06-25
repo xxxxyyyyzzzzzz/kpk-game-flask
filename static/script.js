@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let updateTimeInterval; // Для оновлення часу (окремо від SocketIO)
 
     // Ініціалізація Socket.IO клієнта
-    // Socket.IO для Node.js сервера використовується без додаткових параметрів
+    // Socket.IO для Deno сервера використовується без додаткових параметрів
     const socket = io(); 
 
     // Слухаємо події від сервера Socket.IO
