@@ -1,0 +1,926 @@
+/* General Styling */
+html, body {
+    height: 100%; /* Ensure html and body take full viewport height */
+    margin: 0;
+    padding: 0;
+}
+body {
+    font-family: 'Inter', sans-serif; /* Змінено на Inter */
+    background-color: #222;
+    color: rgba(190, 190, 190, 1); /* Загальний колір шрифту для всього додатку */
+    overflow: hidden; /* Prevents browser window scroll */
+    box-sizing: border-box;
+    /* Add safe area padding to the body so phone-frame adjusts to it */
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-top: env(safe-area-inset-top);
+}
+
+.phone-frame {
+    width: 100%; /* Розтягується на всю ширину body */
+    height: 100%; /* Розтягується на всю висоту body (яка 100% viewport) */
+    max-height: 1080px; /* Максимальна висота залишається для великих екранів */
+    border: none; /* Видалено рамку */
+    border-radius: 0; /* Видалено заокруглення */
+    background-color: rgba(48, 48, 48, 1); /* Колір фону з UIDL */
+    box-shadow: none; /* Видалено тінь */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* ВАЖЛИВО: Тепер цей контейнер обрізає вміст, що виходить за його межі */
+    position: relative; /* Зберігає абсолютне позиціонування дочірніх екранів */
+}
+
+/* Flexbox for screen sections to manage height dynamically */
+.login-container,
+.main-menu-container,
+.score-container,
+.mission-container {
+    flex-grow: 1; /* Allow these sections to fill available height */
+    display: flex;
+    flex-direction: column; /* Changed to column to stack header and content */
+    width: 100%;
+    position: absolute; /* Тримає екрани накладеними один на одного */
+    top: 0;
+    left: 0;
+    height: 100%; /* Займає повну висоту батьківського елемента (.phone-frame) */
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; /* Додано opacity для плавного зникнення */
+}
+
+.hidden {
+    transform: translateX(100%);
+    opacity: 0; /* Add opacity for smoother transition when hidden */
+    pointer-events: none; /* Disable interaction when hidden */
+}
+
+.visible {
+    transform: translateX(0);
+    opacity: 1; /* Ensure full opacity when visible */
+    pointer-events: auto; /* Enable interaction when visible */
+}
+
+/* Common Header Styles */
+.common-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25.5px; /* Оновлено padding з UIDL */
+    background-color: rgba(28, 28, 28, 1); /* Оновлено background-color з UIDL */
+    border-bottom: 1px solid #444;
+    color: rgba(190, 190, 190, 1); /* Header text color */
+    flex-shrink: 0; /* Prevent header from shrinking */
+    
+    position: sticky; /* Sticky header for better scrolling integration */
+    top: 0;
+    z-index: 100;
+    margin-top: 0;
+    box-sizing: border-box;
+    padding-top: calc(15px + env(safe-area-inset-top)); /* Адаптація для iOS Safe Area */
+    height: 80px; /* Приблизна висота хедера з UIDL: 50px (кнопка) + 2*15px (верт. падінг) = 80px */
+}
+
+.common-header .header-home-button {
+    background-color: transparent;
+    border: 1px solid rgba(190, 190, 190, 1);
+    border-radius: 0;
+    color: rgba(190, 190, 190, 1);
+    padding: 11px 14px;
+    cursor: pointer;
+    font-size: 24px;
+    width: 189px; /* Оновлено width з UIDL */
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    font-weight: 700;
+    gap: 10px;
+    flex-shrink: 0;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+}
+
+.common-header .header-home-button:hover {
+    background-color: rgba(190, 190, 190, 0.1);
+}
+
+.common-header .header-title {
+    flex-grow: 1;
+    text-align: center;
+    font-size: 26px;
+    font-weight: bold;
+    color: rgba(190, 190, 190, 1);
+    font-family: 'Inter', sans-serif;
+}
+
+.common-header .header-time-display {
+    font-size: 40px;
+    font-weight: 500; /* Оновлено font-weight з UIDL */
+    color: rgba(190, 190, 190, 1);
+    min-width: auto;
+    margin-right: 0;
+    text-align: right;
+    flex-shrink: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Login Screen Styles */
+.login-container {
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(48, 48, 48, 1);
+}
+
+.login-form {
+    background-color: transparent;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: none;
+    text-align: center;
+    width: 80%;
+    max-width: 300px;
+}
+
+.login-form h2 {
+    color: rgba(190, 190, 190, 1);
+    margin-bottom: 25px;
+    font-size: 28px;
+    font-family: 'Inter', sans-serif;
+}
+
+.login-field {
+    margin-bottom: 20px;
+}
+
+.login-field input {
+    width: calc(100% - 20px);
+    padding: 12px 10px;
+    border: 1px solid rgba(190, 190, 190, 1);
+    border-radius: 6px;
+    background-color: transparent;
+    color: rgba(190, 190, 190, 1);
+    font-size: 18px;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+}
+
+.login-field input::placeholder {
+    color: #bbb;
+    font-family: 'Inter', sans-serif;
+}
+
+.login-button {
+    background-color: transparent;
+    border: 1px solid rgba(190, 190, 190, 1);
+    border-radius: 0;
+    color: rgba(190, 190, 190, 1);
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+}
+
+.login-button:hover {
+    background-color: rgba(190, 190, 190, 0.1);
+}
+
+.message {
+    color: #f00;
+    margin-top: 15px;
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Main Menu Screen Styles */
+.main-menu-container {
+    background-color: rgba(48, 48, 48, 1);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.main-menu-container .content-area {
+    padding-top: 40px; /* Змінено відступ під хедером на 40px */
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding-left: 0;
+    padding-right: 0;
+    overflow-y: auto; /* Додано скролінг для головного меню, якщо контент не поміщається */
+    min-height: 0; /* ДОДАНО: Для коректного скролу Flex-елемента */
+}
+
+.main-menu-container .user-info-section {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    padding-left: 20px;
+    box-sizing: border-box;
+    margin-top: 0;
+    margin-bottom: 30px;
+    flex-shrink: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.main-menu-container .user-label {
+    font-size: 20px;
+    color: rgba(190, 190, 190, 1);
+    font-weight: 500;
+    text-align: left;
+    display: flex;
+    gap: 5px;
+    font-family: 'Inter', sans-serif;
+}
+
+.main-menu-container .menu-options {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
+    padding-left: 20px;
+    box-sizing: border-box;
+}
+
+.main-menu-container .menu-items {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 231px;
+    max-width: 231px;
+}
+
+.main-menu-container .menu-item {
+    background-color: transparent;
+    border: 1px solid rgba(190, 190, 190, 1);
+    border-radius: 0;
+    color: rgba(190, 190, 190, 1);
+    padding: 4px 15px;
+    cursor: pointer;
+    font-size: 36px;
+    font-weight: 500;
+    text-align: left;
+    transition: background-color 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    flex-shrink: 0;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+}
+
+.main-menu-container .menu-item:hover {
+    background-color: rgba(190, 190, 190, 0.1);
+}
+
+.logout-button-container {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    padding-left: 20px;
+    box-sizing: border-box;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    flex-shrink: 0;
+}
+
+.logout-button {
+    background-color: transparent;
+    border: 1px solid rgba(190, 190, 190, 1);
+    border-radius: 0;
+    color: rgba(190, 190, 190, 1);
+    padding: 4px 33px;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    min-width: auto;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+}
+
+.logout-button:hover {
+    background-color: rgba(190, 190, 190, 0.1);
+}
+
+.reset-button-container {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    flex-shrink: 0;
+}
+
+.reset-game-button-bottom {
+    background-color: #8b0000;
+    border: 1px solid #b22222;
+    border-radius: 6px;
+    color: #eee;
+    padding: 8px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.reset-game-button-bottom:hover {
+    background-color: #a00000;
+}
+
+
+/* Missions Screen Styles */
+.mission-container {
+    background-color: rgba(48, 48, 48, 1);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column; /* Стек хедер та контент вертикально */
+    flex-grow: 1; /* Дозволяє займати всю доступну висоту */
+    position: absolute; /* Тримаємо абсолютне позиціонування для перемикання екранів */
+    top: 0;
+    left: 0;
+    height: 100%; /* Займаємо повну висоту батьківського елемента */
+    width: 100%; /* Займаємо повну ширину батьківського елемента */
+}
+
+/* New wrapper for the main content area excluding the header */
+.mission-main-content,
+.score-main-content {
+    flex-grow: 1; /* Take remaining space after header */
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    /* height: 100%; - ВИДАЛЕНО: Це спричиняло конфлікти в розрахунку висоти */
+    box-sizing: border-box;
+    padding: 10px 20px 20px 20px; /* Padding for the entire content area, from top (below header) to bottom */
+    min-height: 0; /* ДОДАНО: Це дозволяє контейнеру правильно стискатися у Flex-контейнері */
+}
+
+.mission-top-section { /* Обгортка для заголовка "Місії" та інфо користувача */
+    width: 100%; /* Займає всю ширину всередині .mission-main-content */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 30px; /* Зазор між заголовком "Місії" та інфо користувача */
+    flex-shrink: 0; /* Prevent from shrinking */
+}
+
+/* New scrollable area for mission blocks */
+.missions-scroll-area {
+    flex-grow: 1; /* Take all remaining space within mission-main-content */
+    overflow-y: auto; /* This is where the scrolling happens for mission blocks! */
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 20px; /* 20px gap under "Бали:" section */
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Gap between level blocks */
+    min-height: 0; /* ДОДАНО: Це дозволяє контейнеру стискатися і дозволяє скролу працювати */
+}
+
+
+/* Стиль для головного заголовка "Місії" */
+.section-title-mission {
+    font-size: 32px; /* З UIDL Frame15 */
+    font-weight: 500; /* З UIDL Frame15 */
+    color: rgba(190, 190, 190, 1);
+    margin-bottom: 0;
+    padding: 4px 15px; /* З UIDL Frame15 */
+    border: 1px solid rgba(190, 190, 190, 1); /* З UIDL Frame15 */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    width: 189px; /* З UIDL Frame15 */
+    box-sizing: border-box;
+    flex-shrink: 0;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+}
+
+.user-mission-info { /* Обгортка для інформації про користувача */
+    width: 100%;
+    display: flex;
+    flex-direction: column; /* Основний напрямок - стовпчик */
+    align-items: flex-start;
+    gap: 5px; /* Зазор між рядками інформації */
+    font-family: 'Inter', sans-serif;
+    color: rgba(190, 190, 190, 1);
+    font-size: 24px; /* З UIDL Frame79 */
+    font-weight: 500; /* З UIDL Frame79 */
+    padding-left: 0;
+}
+
+.user-mission-top-row { /* Для /Користувач та I: 5 II: 5 III: 5 */
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Дозволяємо перенос, якщо ширина недостатня */
+    gap: 10px; /* Зазор між елементами, якщо вони переносяться */
+}
+
+.user-mission-info .user-label { /* Для тексту нікнейму та балів I,II,III */
+    font-size: 24px;
+    font-weight: 500;
+    color: rgba(190, 190, 190, 1);
+}
+
+.user-label-total-score { /* Стиль для загальних балів під ніком */
+    font-size: 24px; /* З UIDL Frame79 */
+    font-weight: 500;
+    color: rgba(190, 190, 190, 1);
+    width: 100%; /* Займає всю ширину */
+    text-align: left; /* Вирівнюємо по лівому краю */
+    margin-top: 10px; /* Додатковий відступ від верхнього ряду */
+}
+
+.mission-stats-group {
+    display: flex;
+    align-items: center;
+    gap: 18px; /* З UIDL Frame80 */
+}
+
+.mission-stat {
+    font-family: 'Inter', sans-serif;
+    font-size: 24px;
+    font-weight: 500;
+    color: rgba(190, 190, 190, 1);
+}
+
+/* Стилі для блоків місій за рівнями */
+.missions-level-block {
+    width: 100%; /* Ширина на весь екран всередині .missions-scroll-area */
+    padding: 10px 0 20px; /* З UIDL Frame93. Верхній 10px, нижній 20px, горизонтальні 0 для подальшого падінгу списку місій */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Вирівнювання заголовка */
+    gap: 11px; /* Зазор між заголовком рівня та списком місій */
+    border: 1px solid rgba(190, 190, 190, 1); /* З UIDL Frame93 */
+    /* overflow: hidden; - ВИДАЛЕНО: Це заважало розтягуванню та прокручуванню батьківського елемента */
+}
+
+/* New class for level titles to apply consistent padding */
+.section-title-level {
+    font-size: 20px; /* З UIDL Frame93 */
+    font-weight: 500; /* З UIDL Frame93 */
+    color: rgba(190, 190, 190, 1);
+    margin-bottom: 0;
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 25px; /* Відступ з UIDL Frame93, щоб текст був зліва */
+    padding-right: 25px;
+    font-family: 'Inter', sans-serif;
+}
+
+.missions-list {
+    display: flex;
+    flex-direction: row; /* Розміщуємо картки в ряд */
+    flex-wrap: wrap; /* Дозволяємо переносити картки на новий рядок */
+    justify-content: center; /* Центруємо картки */
+    gap: 20px; /* Відступ між картками */
+    width: 100%;
+    padding: 0 25px; /* Внутрішній відступ від країв блоку, як у UIDL */
+    box-sizing: border-box;
+}
+
+.mission-item { /* Картка місії */
+    border: 1px solid rgba(190, 190, 190, 1);
+    padding: 8px; /* З UIDL Frame81/82 */
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Зазор між внутрішніми елементами картки */
+    width: calc(50% - 10px); /* Дві картки на ряд з відступом 20px */
+    box-sizing: border-box;
+    align-items: stretch; /* Розтягуємо внутрішні елементи по ширині картки */
+    flex-shrink: 0;
+    height: auto; /* Картка тягнеться по висоті від вмісту */
+}
+
+.mission-header-row { /* Текст місії та кнопка заміни */
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; /* Вирівнюємо зверху, якщо текст довгий */
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    color: rgba(190, 190, 190, 1);
+}
+
+.mission-name {
+    font-size: 16px; /* З UIDL Frame83 */
+    font-weight: 500;
+    flex-grow: 1; /* Дозволяє тексту займати максимум місця */
+    text-align: left;
+    padding-right: 10px; /* Щоб не наповзало на кнопку */
+}
+
+.mission-action-button { /* Кнопка заміни місії (SVG) */
+    background-color: transparent;
+    border: 1px solid rgba(190, 190, 190, 1);
+    width: 25px; /* З UIDL Frame82 */
+    height: 25px; /* З UIDL Frame82 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    overflow: hidden;
+    position: relative; /* Щоб SVG був всередині */
+}
+
+.mission-action-button:hover {
+    background-color: rgba(190, 190, 190, 0.1);
+}
+
+.mission-action-button svg {
+    position: absolute; /* Позиціонуємо SVG абсолютно всередині кнопки */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Центруємо SVG */
+    width: 15px; /* З UIDL */
+    height: 13px; /* З UIDL */
+}
+
+.mission-progress-row { /* Прогрес місії */
+    display: flex;
+    justify-content: center; /* Центруємо текст */
+    align-items: center;
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    color: rgba(190, 190, 190, 1);
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 5px; /* Відступ до кнопок */
+}
+.mission-progress-label {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+
+.mission-buttons-row { /* Кнопки - та + */
+    display: flex;
+    justify-content: space-around; /* Розміщуємо по краях з відступом між ними */
+    align-items: center;
+    gap: 12px; /* З UIDL Frame87 */
+    width: 100%;
+    margin-bottom: 10px; /* Відступ до балів */
+}
+
+.mission-action-button-small { /* Стиль для кнопок - та + */
+    background-color: transparent;
+    border: 1px solid rgba(190, 190, 190, 1);
+    border-radius: 0;
+    color: rgba(190, 190, 190, 1);
+    padding: 8px 15px; /* Приклад падінгу */
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    font-family: 'Inter', sans-serif;
+    width: 80px; /* Фіксована ширина як в UIDL */
+    text-align: center;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.mission-action-button-small:hover {
+    background-color: rgba(190, 190, 190, 0.1);
+}
+
+.mission-rewards-row { /* Бали місії в самому низу */
+    width: 100%;
+    display: flex;
+    flex-direction: column; /* Бали стовпчиком */
+    align-items: flex-start; /* Вирівнюємо по лівому краю */
+    gap: 5px; /* Відступ між рядками балів */
+    padding-top: 5px; /* Невеликий відступ від кнопок */
+    border-top: 1px dashed rgba(190, 190, 190, 0.5); /* Для візуального відділення */
+    margin-top: auto; /* Виштовхує блок з нагородами вниз картки */
+    position: static; /* Видалено absolute positioning */
+}
+
+.mission-reward-text { /* Для кожного тексту нагород */
+    color: rgba(190, 190, 190, 1);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: left;
+    line-height: normal;
+    position: static; /* Видалено absolute positioning */
+    top: auto;
+    left: auto;
+}
+
+
+/* Score Screen Styles (ЄБали) */
+.score-container {
+    background-color: rgba(48, 48, 48, 1);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column; /* Стек хедер та контент вертикально */
+    flex-grow: 1; /* Дозволяє займати всю доступну висоту */
+    position: absolute; /* Тримаємо абсолютне позиціонування для перемикання екранів */
+    top: 0;
+    left: 0;
+    height: 100%; /* Займаємо повну висоту батьківського елемента */
+    width: 100%; /* Займаємо повну ширину батьківського елемента */
+}
+
+/* New wrapper for the main content area excluding the header */
+.score-main-content {
+    flex-grow: 1; /* Take remaining space after header */
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    /* height: 100%; - ВИДАЛЕНО: Це спричиняло конфлікти в розрахунку висоти */
+    box-sizing: border-box;
+    padding: 10px 20px 20px 20px; /* Padding for the entire content area, from top (below header) to bottom */
+    min-height: 0; /* ДОДАНО: Це дозволяє контейнеру правильно стискатися у Flex-контейнері */
+}
+
+/* New scrollable area for score lists */
+.score-scroll-area {
+    flex-grow: 1; /* Take all remaining space within score-main-content */
+    overflow-y: auto; /* This is where the scrolling happens for score lists! */
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 15px; /* Gap under "ЄБали" title */
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Gap between "Топ гравців" та "Історія балів" sections */
+    min-height: 0; /* ДОДАНО: Це дозволяє контейнеру стискатися і дозволяє скролу працювати */
+}
+
+/* Стиль для головного заголовка "ЄБали" */
+.section-title-score {
+    font-size: 32px; /* З UIDL */
+    font-weight: 500; /* З UIDL */
+    color: rgba(190, 190, 190, 1);
+    margin-bottom: 0;
+    padding: 4px 15px; /* З UIDL */
+    border: 1px solid rgba(190, 190, 190, 1); /* З UIDL */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    width: 189px; /* З UIDL */
+    box-sizing: border-box;
+    flex-shrink: 0;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Загальний стиль для підрозділів (Топ гравців, Історія балів) */
+.section-title {
+    font-size: 20px; /* Змінено з 24px на 20px для підрозділів */
+    color: rgba(190, 190, 190, 1);
+    font-weight: 500;
+    margin-bottom: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 5px;
+    font-family: 'Inter', sans-serif;
+}
+
+
+.top-players-container {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid rgba(190, 190, 190, 1);
+    padding: 5px 10px;
+}
+
+.top-players-list {
+    background-color: transparent;
+    border-radius: 0;
+    padding: 0;
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    width: 100%;
+}
+
+.player-score-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0;
+    border-bottom: none;
+    font-size: 24px;
+    color: rgba(190, 190, 190, 1);
+    font-weight: 500;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 5px;
+    font-family: 'Inter', sans-serif;
+}
+
+.player-score-item:last-child {
+    border-bottom: none;
+}
+
+.score-history-list {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid rgba(190, 190, 190, 1);
+    padding: 5px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0;
+    border-bottom: none;
+    font-size: 16px;
+    color: rgba(190, 190, 190, 1);
+    font-weight: 500;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 5px;
+    font-family: 'Inter', sans-serif;
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.score-change-positive {
+    font-weight: bold;
+    color: #6cff6c;
+}
+
+.score-change-negative {
+    font-weight: bold;
+    color: #ff6c6c;
+}
+
+/* Ensure all font colors are consistent based on UIDL for general text */
+body,
+input,
+button,
+.common-header .header-time-display,
+.login-form h2 {
+    color: rgba(190, 190, 190, 1);
+}
+
+/* Specific button text colors */
+.login-button span,
+.menu-item span,
+.logout-button span,
+.common-header .header-home-button span {
+    color: rgba(190, 190, 190, 1) !important;
+}
+
+/* Specific adjustments for input placeholders */
+input::placeholder {
+    color: #bbb !important;
+}
+
+/* Ensure text in buttons uses the specified font-weight */
+.login-button span,
+.menu-item span,
+.logout-button span,
+.common-header .header-home-button span,
+.common-header .header-title,
+.section-title,
+.user-label,
+.section-title-mission, /* Додано */
+.section-title-score, /* Додано */
+.user-label-total-score, /* Додано */
+.section-title-level { /* Додано */
+    font-family: 'Inter', sans-serif;
+}
+
+/* Modal styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: rgba(48, 48, 48, 1);
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    color: rgba(190, 190, 190, 1);
+    max-width: 80%;
+    min-width: 280px;
+}
+
+.modal-content p {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.modal-button {
+    background-color: transparent;
+    border: 1px solid rgba(190, 190, 190, 1);
+    border-radius: 0;
+    color: rgba(190, 190, 190, 1);
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.modal-button:hover {
+    background-color: rgba(190, 190, 190, 0.1);
+}
+
+/* Media query for smaller screens/heights */
+@media (max-height: 740px) {
+    .common-header {
+        margin-top: 0;
+        padding-top: calc(5px + env(safe-area-inset-top));
+    }
+    .main-menu-container .content-area {
+        padding-top: 20px; /* Adjust for smaller screens, consistent with new main padding */
+    }
+    .main-menu-container .user-info-section {
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+    .main-menu-container .menu-items {
+        gap: 10px;
+    }
+    .main-menu-container .menu-item {
+        padding: 8px 15px;
+        font-size: 30px;
+    }
+    .logout-button-container {
+        margin-top: 15px;
+        margin-bottom: 10px;
+    }
+    /* .score-history-list { height: 150px; } - Видалено */
+    /* .top-players-container { max-height: 150px; } - Видалено */
+    .reset-button-container {
+        bottom: 10px;
+        right: 10px;
+    }
+    .score-main-content {
+        padding-top: 10px; /* Adjust for smaller screens, consistency with primary padding */
+    }
+    .mission-main-content { /* Adjust for smaller screens */
+        padding-top: 10px; /* Adjust for smaller screens, consistency with primary padding */
+    }
+    .mission-item {
+        gap: 8px; /* Зменшений зазор всередині елемента місії */
+        padding: 8px; /* Зменшений padding елемента місії */
+    }
+}

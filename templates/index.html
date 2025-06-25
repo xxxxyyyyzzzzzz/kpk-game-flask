@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>КПК</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Підключення клієнтської бібліотеки Socket.IO -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
+</head>
+<body>
+    <div class="phone-frame">
+        <!-- Login Screen -->
+        <div id="login-screen" class="login-container visible">
+            <form class="login-form">
+                <h2>Вхід</h2>
+                <div class="login-field">
+                    <input type="text" id="nickname-input" placeholder="Введіть ваш нікнейм">
+                </div>
+                <button type="button" class="login-button">
+                    <span>Увійти</span>
+                </button>
+                <p id="login-message" class="message"></p>
+            </form>
+        </div>
+
+        <!-- Main Menu Screen -->
+        <div id="main-menu-screen" class="main-menu-container hidden">
+            <header class="common-header">
+                <button id="main-menu-home-button" class="header-home-button">
+                    <span>Головна</span>
+                </button>
+                <div id="main-menu-header-time" class="header-time-display">00:00</div>
+            </header>
+            <div class="content-area">
+                <div class="user-info-section">
+                    <span class="user-label">/<span id="current-user-main-menu"></span> : <span id="current-score-main-menu"></span> Балів</span>
+                </div>
+                <div class="menu-options">
+                    <div class="menu-items">
+                        <button id="mission-button" class="menu-item">
+                            <span>Місії</span>
+                        </button>
+                        <button id="yebaly-button" class="menu-item">
+                            <span>ЄБали</span>
+                        </button>
+                        <button id="news-button" class="menu-item">
+                            <span>Новини</span>
+                        </button>
+                        <button id="upgrades-button" class="menu-item">
+                            <span>Прокачки</span>
+                        </button>
+                    </div>
+                    <div class="logout-button-container">
+                        <button id="logout-button" class="logout-button">
+                            <span>Вийти</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="reset-button-container">
+                <button id="reset-game-button" class="reset-game-button-bottom">Скинути гру</button>
+            </div>
+        </div>
+
+        <!-- Missions Screen -->
+        <div id="mission-screen" class="mission-container hidden">
+            <header class="common-header">
+                <button id="mission-back-button" class="header-home-button">
+                    <span>Головна</span>
+                </button>
+                <div id="mission-header-time" class="header-time-display">00:00</div>
+            </header>
+            <div class="mission-main-content"> <!-- New wrapper for main content area -->
+                <div class="mission-top-section">
+                    <h2 class="section-title-mission">Місії</h2>
+                    <div class="user-mission-info">
+                        <div class="user-mission-top-row">
+                            <span class="user-label">/<span id="current-user-mission-screen">Користувач</span></span>
+                            <div class="mission-stats-group">
+                                <span class="mission-stat">I: <span id="mission-stat-i">5</span></span>
+                                <span class="mission-stat">II: <span id="mission-stat-ii">5</span></span>
+                                <span class="mission-stat">III: <span id="mission-stat-iii">5</span></span>
+                            </div>
+                        </div>
+                        <span class="user-label-total-score">Бали: <span id="current-score-mission-screen">25</span></span>
+                    </div>
+                </div>
+
+                <div id="missions-scroll-area" class="missions-scroll-area"> <!-- New scrollable area -->
+                    <!-- Блок Місій першого рівня -->
+                    <div class="missions-level-block">
+                        <h2 class="section-title-level">Місії першого рівня</h2>
+                        <div class="missions-list">
+                            <!-- Приклад місії 1 -->
+                            <div class="mission-item">
+                                <div class="mission-header-row">
+                                    <span class="mission-name">Вбити 10 мутантів тертього рівня</span>
+                                    <button class="mission-action-button">
+                                        <img src="{{ url_for('static', filename='reload.svg') }}" alt="Reload mission" style="width: 15px; height: 13px;">
+                                    </button>
+                                </div>
+                                <div class="mission-progress-row">
+                                    <span class="mission-progress-label">Прогрес місії 7/10</span>
+                                </div>
+                                <div class="mission-buttons-row">
+                                    <button class="mission-action-button-small">-</button>
+                                    <button class="mission-action-button-small">+</button>
+                                </div>
+                                <div class="mission-rewards-row">
+                                    <span class="mission-reward-text">I: 5 Балів</span>
+                                    <span class="mission-reward-text">15 Балів</span>
+                                    <span class="mission-reward-text">8 валюти</span>
+                                </div>
+                            </div>
+                            <!-- Приклад місії 2 -->
+                            <div class="mission-item">
+                                <div class="mission-header-row">
+                                    <span class="mission-name">Знищити ворожий Байрактар</span>
+                                    <button class="mission-action-button">
+                                        <img src="{{ url_for('static', filename='reload.svg') }}" alt="Reload mission" style="width: 15px; height: 13px;">
+                                    </button>
+                                </div>
+                                <div class="mission-progress-row">
+                                    <span class="mission-progress-label">Прогрес місії 1/1</span>
+                                </div>
+                                <div class="mission-buttons-row">
+                                    <button class="mission-action-button-small">-</button>
+                                    <button class="mission-action-button-small">+</button>
+                                </div>
+                                <div class="mission-rewards-row">
+                                    <span class="mission-reward-text">I: 10 Балів</span>
+                                    <span class="mission-reward-text">50 Балів</span>
+                                    <span class="mission-reward-text">20 валюти</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Блок Місій другого рівня -->
+                    <div class="missions-level-block">
+                        <h2 class="section-title-level">Місії другого рівня</h2>
+                        <div class="missions-list">
+                            <!-- Приклад місії 3 -->
+                            <div class="mission-item">
+                                <div class="mission-header-row">
+                                    <span class="mission-name">Підірвати склад боєприпасів</span>
+                                    <button class="mission-action-button">
+                                        <img src="{{ url_for('static', filename='reload.svg') }}" alt="Reload mission" style="width: 15px; height: 13px;">
+                                    </button>
+                                </div>
+                                <div class="mission-progress-row">
+                                    <span class="mission-progress-label">Прогрес місії 3/5</span>
+                                </div>
+                                <div class="mission-buttons-row">
+                                    <button class="mission-action-button-small">-</button>
+                                    <button class="mission-action-button-small">+</button>
+                                </div>
+                                <div class="mission-rewards-row">
+                                    <span class="mission-reward-text">II: 7 Балів</span>
+                                    <span class="mission-reward-text">25 Балів</span>
+                                    <span class="mission-reward-text">12 валюти</span>
+                                </div>
+                            </div>
+                            <!-- Приклад місії 4 -->
+                            <div class="mission-item">
+                                <div class="mission-header-row">
+                                    <span class="mission-name">Захопити ворожу будівлю</span>
+                                    <button class="mission-action-button">
+                                        <img src="{{ url_for('static', filename='reload.svg') }}" alt="Reload mission" style="width: 15px; height: 13px;">
+                                    </button>
+                                </div>
+                                <div class="mission-progress-row">
+                                    <span class="mission-progress-label">Прогрес місії 0/1</span>
+                                </div>
+                                <div class="mission-buttons-row">
+                                    <button class="mission-action-button-small">-</button>
+                                    <button class="mission-action-button-small">+</button>
+                                </div>
+                                <div class="mission-rewards-row">
+                                    <span class="mission-reward-text">II: 12 Балів</span>
+                                    <span class="mission-reward-text">40 Балів</span>
+                                    <span class="mission-reward-text">18 валюти</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Блок Місій третього рівня -->
+                    <div class="missions-level-block">
+                        <h2 class="section-title-level">Місії третього рівня</h2>
+                        <div class="missions-list">
+                            <!-- Приклад місії 5 -->
+                            <div class="mission-item">
+                                <div class="mission-header-row">
+                                    <span class="mission-name">Знищити групу танків (3 шт.)</span>
+                                    <button class="mission-action-button">
+                                        <img src="{{ url_for('static', filename='reload.svg') }}" alt="Reload mission" style="width: 15px; height: 13px;">
+                                    </button>
+                                </div>
+                                <div class="mission-progress-row">
+                                    <span class="mission-progress-label">Прогрес місії 1/3</span>
+                                </div>
+                                <div class="mission-buttons-row">
+                                    <button class="mission-action-button-small">-</button>
+                                    <button class="mission-action-button-small">+</button>
+                                </div>
+                                <div class="mission-rewards-row">
+                                    <span class="mission-reward-text">III: 10 Балів</span>
+                                    <span class="mission-reward-text">75 Балів</span>
+                                    <span class="mission-reward-text">30 валюти</span>
+                                </div>
+                            </div>
+                            <!-- Приклад місії 6 -->
+                            <div class="mission-item">
+                                <div class="mission-header-row">
+                                    <span class="mission-name">Провести розвідку території</span>
+                                    <button class="mission-action-button">
+                                        <img src="{{ url_for('static', filename='reload.svg') }}" alt="Reload mission" style="width: 15px; height: 13px;">
+                                    </button>
+                                </div>
+                                <div class="mission-buttons-row">
+                                    <button class="mission-action-button-small">-</button>
+                                    <button class="mission-action-button-small">+</button>
+                                </div>
+                                <div class="mission-rewards-row">
+                                    <span class="mission-reward-text">III: 15 Балів</span>
+                                    <span class="mission-reward-text">100 Балів</span>
+                                    <span class="mission-reward-text">40 валюти</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Score Screen (ЄБали) -->
+        <div id="score-screen" class="score-container hidden">
+            <header class="common-header">
+                <button id="score-back-button" class="header-home-button">
+                    <span>Головна</span>
+                </button>
+                <div id="score-header-time" class="header-time-display">00:00</div>
+            </header>
+            <div class="score-main-content"> <!-- New wrapper for main content area -->
+                <h2 class="section-title-score">ЄБали</h2>
+                <div id="score-scroll-area" class="score-scroll-area"> <!-- New scrollable area -->
+                    <h2 class="section-title">Топ гравців</h2>
+                    <div class="top-players-container">
+                        <div id="top-players-list" class="top-players-list">
+                            <!-- Player scores will be loaded here -->
+                        </div>
+                    </div>
+                    <h2 class="section-title">Історія балів</h2>
+                    <div id="score-history-list" class="score-history-list">
+                        <!-- Score history will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Modal Structure (для заміни alert/confirm) -->
+    <div id="custom-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <p id="modal-message"></p>
+            <div class="modal-buttons">
+                <button id="modal-ok-button" class="modal-button">ОК</button>
+                <button id="modal-cancel-button" class="modal-button hidden">Скасувати</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
